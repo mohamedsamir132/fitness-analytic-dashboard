@@ -1,56 +1,72 @@
-🏋️ Fitness Analytic Dashboard — Power BI
+# 🏋️ Fitness Analytic Dashboard — Power BI
 
-Track Revenue · Monitor Members · Calculate Health
-A complete Power BI dashboard for gym operations, membership trends, finances, and personal wellness analytics.
+> **Track Revenue · Monitor Members · Calculate Health**  
+> A complete Power BI dashboard for gym operations, membership trends, finances, and personal wellness analytics.
 
+---
 
-📸 Dashboard Preview
-HomeOverallShow ImageShow Image
-CalculatorMembersShow ImageShow Image
+## 📸 Dashboard Preview
 
-📋 Overview
-The Fitness Analytic Dashboard is a 4-page interactive Power BI report designed for gym owners and fitness managers. It combines financial tracking, membership management, and a personal health calculator into a single, beautiful dark-themed dashboard.
+| Home | Overall |
+|------|---------|
+| ![](<screenshots/Fitness Project-1.png>) | ![](<screenshots/Fitness Project-2.png>) |
 
-📄 Pages
-🏠 1. Home
+| Calculator | Members |
+|------------|---------|
+| ![](<screenshots/Fitness Project-3.png>) | ![](<screenshots/Fitness Project-4.png>) |
 
-Hero landing page with navigation to all sections
-Quick KPI preview: Total Members, Trainers, Revenue, Profit
+---
 
-📊 2. Overall (Finances)
+## 📋 Overview
 
-Monthly Revenue, Expenses, and Profit trend chart
-Membership breakdown by type: Platinum, Gold, Silver
-Active vs Expired membership counts
-Monthly member count with Min/Max toggle
-Client membership progress table with SVG progress bars
+The **Fitness Analytic Dashboard** is a 4-page interactive Power BI report designed for gym owners and fitness managers. It combines financial tracking, membership management, and a personal health calculator into a single, beautiful dark-themed dashboard.
 
-🧮 3. Calculator
+---
 
-BMI Calculator with color-coded gauge (Underweight / Normal / Overweight / Obese)
-BMR Calculator using the Mifflin-St Jeor equation
-TDEE based on selected activity level
-Calorie targets: Maintain, Mild Loss, Weight Loss, Extreme Loss
-Gender toggle (Male / Female) with dynamic background image
-Sliders for Age, Height (ft), and Weight (kg)
+## 📄 Pages
 
-👥 4. Members
+### 🏠 1. Home
+- Hero landing page with navigation to all sections
+- Quick KPI preview: Total Members, Trainers, Revenue, Profit
 
-Members by Age Group and Gender (18–25, 25–40, 40–60)
-Members by Age Group and Status (Active / Expired)
-Full client membership table with progress bars
+### 📊 2. Overall (Finances)
+- Monthly Revenue, Expenses, and Profit trend chart
+- Membership breakdown by type: Platinum, Gold, Silver
+- Active vs Expired membership counts
+- Monthly member count with Min/Max toggle
+- Client membership progress table with SVG progress bars
 
+### 🧮 3. Calculator
+- **BMI Calculator** with color-coded gauge (Underweight / Normal / Overweight / Obese)
+- **BMR Calculator** using the Mifflin-St Jeor equation
+- **TDEE** based on selected activity level
+- Calorie targets: Maintain, Mild Loss, Weight Loss, Extreme Loss
+- Gender toggle (Male / Female) with dynamic background image
+- Sliders for Age, Height (ft), and Weight (kg)
 
-🧮 DAX Measures
+### 👥 4. Members
+- Members by Age Group and Gender (18–25, 25–40, 40–60)
+- Members by Age Group and Status (Active / Expired)
+- Full client membership table with progress bars
+
+---
+
+## 🧮 DAX Measures
+
 <details>
 <summary>Click to expand all DAX formulas</summary>
-Core KPIs
-daxUsers_Count = DISTINCTCOUNT(Users[UserID])
+
+### Core KPIs
+```dax
+Users_Count = DISTINCTCOUNT(Users[UserID])
 Revenue = SUM(Payments[Amount])
 Expanses = SUM(Expenses[Amount])
 Profit = [Revenue] - [Expanses]
-Membership Progress
-daxComplete_Days =
+```
+
+### Membership Progress
+```dax
+Complete_Days =
 DATEDIFF(
     SELECTEDVALUE(Users[MembershipStart]),
     MIN(TODAY(), SELECTEDVALUE(Users[MembershipEnd])),
@@ -58,14 +74,20 @@ DATEDIFF(
 )
 
 ProgressPercent = DIVIDE([Complete_Days], [Total_Days], 0) * 100
-BMI
-daxBMI =
+```
+
+### BMI
+```dax
+BMI =
 VAR WeightKg = SELECTEDVALUE(Weight_Slider[Weight_Slider])
 VAR HeightFeet = SELECTEDVALUE(Height_Slider[Height_Slider])
 VAR HeightMeters = HeightFeet * 0.3048
 RETURN ROUND(WeightKg / (HeightMeters * HeightMeters), 1)
-BMR (Mifflin-St Jeor)
-daxBMR =
+```
+
+### BMR (Mifflin-St Jeor)
+```dax
+BMR =
 VAR _Weight = SELECTEDVALUE(Weight_Slider[Weight_Slider])
 VAR HeightFeet = SELECTEDVALUE(Height_Slider[Height_Slider])
 VAR HeightCm = HeightFeet * 30.48
@@ -77,31 +99,67 @@ RETURN
         (10 * _Weight) + (6.25 * HeightCm) - (5 * Age) + 5,
         (10 * _Weight) + (6.25 * HeightCm) - (5 * Age) - 161
     )
-TDEE & Calorie Targets
-daxTDEE = [BMR] * SELECTEDVALUE(Slider_Activity[ActivityFactor])
+```
+
+### TDEE & Calorie Targets
+```dax
+TDEE = [BMR] * SELECTEDVALUE(Slider_Activity[ActivityFactor])
 Maintain Calories            = [TDEE]
 Mild Weight Loss Calories    = [TDEE] * 0.92
 Weight Loss Calories         = [TDEE] * 0.85
 Extreme Weight Loss Calories = [TDEE] * 0.70
+```
+
 </details>
 
-🗂️ Data Model
-TableDescriptionUsersMember profiles — ID, Name, Gender, Age, Membership type, Start/End dates, StatusPaymentsRevenue transactions per memberExpensesGym operating expensesCalendarDate table for time intelligenceTrainersTrainer recordsWeight_SliderParameter table for weight input (kg)Height_SliderParameter table for height input (ft)Age_SliderParameter table for age inputSlider_GenderGender selection table (Male / Female)Slider_ActivityActivity factor table for TDEE multiplierColorCodesTheme color codes for dynamic SVG coloringMin_Max_SwitchToggle table for Monthly Members chartLast_RefreshStores last dashboard refresh timestamp
+---
 
-⚙️ Activity Factors (TDEE Multipliers)
-Activity LevelMultiplierSedentary1.2Lightly Active1.375Moderately Active1.55Very Active1.725Extra Active2.0
+## 🗂️ Data Model
 
-🛠️ How to Use
+| Table | Description |
+|-------|-------------|
+| `Users` | Member profiles — ID, Name, Gender, Age, Membership type, Start/End dates, Status |
+| `Payments` | Revenue transactions per member |
+| `Expenses` | Gym operating expenses |
+| `Calendar` | Date table for time intelligence |
+| `Trainers` | Trainer records |
+| `Weight_Slider` | Parameter table for weight input (kg) |
+| `Height_Slider` | Parameter table for height input (ft) |
+| `Age_Slider` | Parameter table for age input |
+| `Slider_Gender` | Gender selection table (Male / Female) |
+| `Slider_Activity` | Activity factor table for TDEE multiplier |
+| `ColorCodes` | Theme color codes for dynamic SVG coloring |
+| `Min_Max_Switch` | Toggle table for Monthly Members chart |
+| `Last_Refresh` | Stores last dashboard refresh timestamp |
 
-Clone or download this repository
-Open Fitness_Dashboard.pbix in Power BI Desktop
-Go to Transform Data and update file paths to your local dataset if needed
-Click Refresh to load the latest data
-Use the sliders and toggles on the Calculator page to explore health metrics
-Navigate between pages using the top nav bar: Home → Overall → Calculator → Members
+---
 
+## ⚙️ Activity Factors (TDEE Multipliers)
 
-📁 Repository Structure
+| Activity Level | Multiplier |
+|----------------|------------|
+| Sedentary | 1.2 |
+| Lightly Active | 1.375 |
+| Moderately Active | 1.55 |
+| Very Active | 1.725 |
+| Extra Active | 2.0 |
+
+---
+
+## 🛠️ How to Use
+
+1. **Clone or download** this repository
+2. Open `Fitness_Dashboard.pbix` in **Power BI Desktop**
+3. Go to **Transform Data** and update file paths to your local dataset if needed
+4. Click **Refresh** to load the latest data
+5. Use the sliders and toggles on the **Calculator** page to explore health metrics
+6. Navigate between pages using the top nav bar: Home → Overall → Calculator → Members
+
+---
+
+## 📁 Repository Structure
+
+```
 fitness-analytic-dashboard/
 │
 ├── PowerBI/
@@ -118,26 +176,35 @@ fitness-analytic-dashboard/
 │   ├── Fitness Project-3.png         # Calculator page
 │   └── Fitness Project-4.png         # Members page
 └── README.md
+```
 
-🎨 Design
+---
 
-Theme: Dark mode with charcoal backgrounds (#1a1a1a, #2a2a2a)
-Accent Color: Orange (#E8622A) for KPIs and highlights
-Charts: Red progress bars, white/gray secondary elements
-Typography: Clean sans-serif, bold KPI values
+## 🎨 Design
 
+- **Theme:** Dark mode with charcoal backgrounds (`#1a1a1a`, `#2a2a2a`)
+- **Accent Color:** Orange (`#E8622A`) for KPIs and highlights
+- **Charts:** Red progress bars, white/gray secondary elements
+- **Typography:** Clean sans-serif, bold KPI values
 
-📌 Requirements
+---
 
-Power BI Desktop (latest version recommended)
-No external plugins or custom visuals required
-Dataset provided in .xlsx format
+## 📌 Requirements
 
+- Power BI Desktop (latest version recommended)
+- No external plugins or custom visuals required
+- Dataset provided in `.xlsx` format
 
-👤 Author
-Rabie Mohamed
-🔗 LinkedIn
-🐙 GitHub
+---
 
-📜 License
+## 👤 Author
+
+**Rabie Mohamed**  
+🔗 [LinkedIn](https://www.linkedin.com/in/mohamed-rabie-0928b63aa/)  
+🐙 [GitHub](https://github.com/mohamedsamir132)
+
+---
+
+## 📜 License
+
 This project is licensed under the MIT License — feel free to use, modify, and share with attribution.
